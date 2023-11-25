@@ -186,7 +186,7 @@ class Analysis:
             adjusted['timeStamp'] = pd.to_datetime(adjusted['timeStamp'].astype(int), unit='s')
             adjusted = adjusted[(adjusted['timeStamp'].dt.date >= self.start_date) &
                                 (adjusted['timeStamp'].dt.date <= self.end_date)]
-            logging.debug('the df was adjusted!')
+            logging.debug(f'the df was adjusted!')
             return adjusted
         else:
             logging.debug('The df is empty!')
@@ -285,7 +285,9 @@ class Analysis:
         return with_price, no_price, shit_coins
 
     def filtering_outliers(self):
+        logging.debug(f'Entered the tier 1 of filtering: {len(self.top_w_prices)}')
         if len(self.top_w_prices) != 0 and self.outlier_value_threshold is not None:
+            logging.debug(f'Started the tier 1 filtering.')
             scam = self.top_w_prices['value'].describe()['75%'] + (self.top_w_prices['value'].describe()['75%'] *
                                                                    self.outlier_value_threshold)
             scam_coins = self.top_w_prices.query('value > @scam').copy()
@@ -295,6 +297,7 @@ class Analysis:
         return clean, scam_coins
 
     def finding_outliers_tier2(self):
+        logging.debug(f'Entered the tier 2 of filtering: {len(self.without_outliers_tier1)}')
         if len(self.without_outliers_tier1) != 0 and self.outlier_volume_threshold is not None:
             mean_val = self.without_outliers_tier1['trans_value_US'].mean()
             slash = mean_val + (mean_val * self.outlier_volume_threshold)
@@ -363,7 +366,7 @@ class Analysis:
 
             return fig
         else:
-            return self.empty_plot
+            return self.empty_plot if not gpt else self.no_transactions
 
     def gpt_conclusions(self):
         introduction = f' ---- Re-RUNNING the script may help to improve it ---- \n' \
@@ -474,10 +477,8 @@ class Analysis:
             else:
                 data['count_percentage'] = data['count'].astype(str) + " / " + round(
                     (data['count'] / data['count'].sum()) * 100, 1).astype(str) + " %"
-
             if gpt:
                 return data
-
             fig = go.Figure(go.Bar(x=data['trans_value_US' if by_volume else 'count'],
                                    y=data['tokenSymbol'], orientation='h',
                                    text=data['percentage' if by_volume else 'count_percentage']))
@@ -489,7 +490,7 @@ class Analysis:
                               title_font_size=25)
             return fig
         else:
-            return self.empty_plot
+            return self.empty_plot if not gpt else self.no_transactions
 
     def plotting_internal_destinations(self, by, choice, gpt=False):
         if len(self.internal_df) != 0:

@@ -143,8 +143,8 @@ if run_it or run_it_params:
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):
             st.markdown(f"<h4 style='text-align: left;'>ERC-20 AND ETH transactions involving TOP "
-                        f"{num_of_dest if not if_include_all_dest else instance.overall_contracts}"
-                        f" contracts</h3>", unsafe_allow_html=True)
+                        f"{num_of_dest if not if_include_all_dest else instance.overall_destinations}"
+                        f" destinations</h3>", unsafe_allow_html=True)
             st.write(instance.without_outliers_tier2)
         # INTERNAL TRANSACTIONS
         if if_internal:
