@@ -9,7 +9,7 @@ class GptConclusions:
                  top_10_tokens_vol, top_10_dest_to_quantity, top_10_dest_to_vol, top_10_dest_from_quantity,
                  top_10_dest_from_vol, top_10_internal_trans_dest_quantity, top_10_internal_trans_dest_vol, time_data,
                  time_data_days, gas_data_tokens, gas_data_contracts, overall_destinations):
-        self.models = ['gpt4', 'falcon_40b', 'prodia', 'pollinations']  # 'gpt3'
+        self.models = ['gpt4', 'falcon_40b', 'prodia', 'pollinations', 'gpt3']
         self.safe_slicing = 15
         self.error_message = 'smth went wrong***'
         self.prompt_init = f"Can you write several conclusion paragraphs on the strategy of this ETH " \
