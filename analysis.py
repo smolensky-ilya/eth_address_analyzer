@@ -1,7 +1,7 @@
-import streamlit as st
 import requests
 import pandas as pd
 import numpy as np
+from time import sleep
 import plotly.graph_objects as go
 import plotly.express as px
 from stqdm import stqdm
@@ -13,64 +13,86 @@ configure_logging()
 
 
 class Analysis:
-    def __init__(self, address, number_of_contracts, start_date, end_date, if_cont_names,
-                 outlier_value_threshold, outlier_volume_threshold, exclude_outlying, if_exclude_phishing=True,
-                 if_all_contracts=False, use_real_prices=True, if_int=True, if_gpt=True,
-                 if_gas_tick=True, if_time_needed=True, chosen_top=10):
+    def __init__(self, address, number_of_dest, start_date, end_date, if_cont_names,
+                 outlier_value_threshold, outlier_volume_threshold, exclude_outlying, if_exclude_phishing,
+                 if_all_contracts, use_real_prices, if_int, if_gpt,
+                 if_gas_tick, if_time_needed, chosen_top):
+        # ANALYSIS SETTINGS
         self.address = address.lower()
-        self.number_of_contracts = number_of_contracts
-        self.etherscan_api_key = st.secrets['etherscan_api_key']
-        self.not_found_message = "Address wasn't found :("
-        self.empty_plot = go.Figure().add_annotation(x=0.5, y=0.5, xref="paper", yref="paper", text="No Data Available",
-                                                     showarrow=False, font=dict(size=20, color="gray"))\
-            .update_layout(xaxis=dict(showgrid=False, zeroline=False, visible=False),
-                           yaxis=dict(showgrid=False, zeroline=False, visible=False), plot_bgcolor='white')
-        self.untagged_contracts_name = 'Untagged*'
-        self.etherscan_sleep_time = 3
-        self.etherscan_save_frequency = 1  # TEMPORARY
-        self.if_all_contracts = if_all_contracts
-        self.if_contracts_names = if_cont_names
-        self.if_exclude_phishing = if_exclude_phishing
-        self.if_use_real_prices = use_real_prices
         self.if_int = if_int
         self.if_gpt = if_gpt
         self.if_gas = if_gas_tick
         self.if_time = if_time_needed
+        self.if_all_contracts = if_all_contracts
+        self.if_contracts_names = if_cont_names
+        self.if_exclude_phishing = if_exclude_phishing
+        self.if_use_real_prices = use_real_prices
         self.start_date = start_date
         self.end_date = end_date
         self.chosen_top = chosen_top
-        self.stabl_coins = ['usdt', 'usdc', 'dai', 'mim']
-        self.no_transactions = pd.DataFrame()
-        self.phishing = pd.DataFrame()
+        self.number_of_dest = number_of_dest
         self.outlier_value_threshold = outlier_value_threshold if exclude_outlying else None
         self.outlier_volume_threshold = outlier_volume_threshold if exclude_outlying else None
-        self.prices_save_frequency = 1  # TEMPORARY
-        self.gecko_error_sleep_time = 30  # OPTIMAL
-        self.stable_coins_price = 1.00
-        self.name_tags_engine = ContractDb(bar=True, untagged_name=self.untagged_contracts_name,
-                                           sleep_time=self.etherscan_sleep_time,
-                                           threshold_to_save=self.etherscan_save_frequency)
-        self.price_engine = Gecko(save_frequency=self.prices_save_frequency,
-                                  sleep_time=self.gecko_error_sleep_time)
-        self.raw_df = self.get_etherscan()
-        self.internal_df = self.get_etherscan_df_internal() if self.if_int else self.no_transactions
-        self.adjusted = self.adjusting()
-        if len(self.adjusted) != 0:
-            self.top_contracts, self.overall_contracts = self.find_top_contracts(self.number_of_contracts)
-            self.necessary_cols = self.top_contracts[['timeStamp', 'from', 'contractAddress', 'to', 'value',
-                                                      'tokenName', 'tokenSymbol', 'gasPrice', 'gasUsed']]
-            self.over_tokens = len(self.adjusted['tokenSymbol'].copy().value_counts())
-            self.top_w_names = self.finding_contract_names(self.necessary_cols) if self.if_contracts_names \
-                else self.necessary_cols
-            self.top_w_prices, self.no_price, self.shit_coins = self.finding_prices(self.top_w_names)
-            self.without_outliers_tier1, self.scam_coins = self.filtering_outliers()
-            self.without_outliers_tier2, self.outliers_tier2 = self.finding_outliers_tier2()
-            self.combined_outliers, self.percentage_of_outliers = self.combining_all_outliers()
+        # CONFIG SETTINGS
+        self.etherscan_api_key = conf_etherscan_api_key
+        self.not_found_message = conf_not_found_message
+        self.untagged_contracts_name = conf_untagged_contracts_name
+        self.etherscan_sleep_time = conf_etherscan_sleep_time
+        self.etherscan_save_frequency = conf_etherscan_save_frequency
+        self.stabl_coins = conf_stabl_coins
+        self.stable_coins_price = conf_stable_coins_price
+        self.prices_save_frequency = conf_prices_save_frequency
+        self.gecko_error_sleep_time = conf_gecko_error_sleep_time
+        # INITIALIZING EMPTY GRAPHS AND DATAFRAMES
+        self.phishing = pd.DataFrame()
+        self.no_transactions = pd.DataFrame()
+        self.empty_plot = go.Figure().add_annotation(x=0.5, y=0.5, xref="paper", yref="paper", text="No Data Available",
+                                                     showarrow=False, font=dict(size=20, color="gray")).update_layout(
+            xaxis=dict(showgrid=False, zeroline=False, visible=False),
+            yaxis=dict(showgrid=False, zeroline=False, visible=False), plot_bgcolor='white')
+        # PARSING ENGINES INITIALIZATION
+        with st.spinner('Loading parsing engines...'):
+            self.name_tags_engine = ContractDb(bar=True, untagged_name=self.untagged_contracts_name,
+                                               sleep_time=self.etherscan_sleep_time,
+                                               threshold_to_save=self.etherscan_save_frequency)
+            self.price_engine = Gecko(save_frequency=self.prices_save_frequency,
+                                      sleep_time=self.gecko_error_sleep_time)
+        # GETTING TRANSACTIONS FROM ETHERSCAN
+        with st.spinner('Getting stuff from Etherscan'):
+            self.raw_df = self.get_etherscan()
+            self.internal_df = self.get_etherscan_df_internal() if self.if_int else self.no_transactions
+            self.normal_df = self.get_etherscan(which='normal')
+        # ADJUSTING THE DATASET (TIME, VALUES, etc.)
+        with st.spinner('Making stuff look decent...'):
+            self.adjusted = self.adjusting()
+        if len(self.adjusted) != 0:  # IF THE ADDRESS'S GOT TRANSACTIONS TO ANALYZE:
+            with st.spinner('Filtering out some shit...'):
+                self.top_contracts = self.filtering_destinations(self.adjusted)  # FILTERING DESTINATIONS
+                self.necessary_cols = self.top_contracts[['timeStamp', 'from', 'contractAddress', 'to', 'value',
+                                                          'tokenName', 'tokenSymbol', 'gasPrice', 'gasUsed']]
+                # CALCULATING METRICS
+                self.over_tokens = len(self.adjusted['tokenSymbol'].copy().value_counts())
+                self.overall_contracts = len(self.adjusted['contractAddress'].copy().value_counts())
+                self.overall_destinations = len(np.unique(self.adjusted[['to', 'from']].values))  #INTERNAL ONES?!
+                self.analyzed_destinations = len(np.unique(self.top_contracts[['to', 'from']].values))
+            # ADDING NAME TAGS FROM ETHERSCAN (IF OPTED FOR)
+            with st.spinner('Stealing name tags from Etherscan...'):
+                self.top_w_names = self.finding_contract_names(self.necessary_cols) if self.if_contracts_names \
+                    else self.necessary_cols
+            # ADDING TOKEN PRICES FROM CoinGecko
+            with st.spinner('Borrowing ticker prices from CoinGecko...'):
+                self.top_w_prices, self.no_price, self.shit_coins = self.finding_prices(self.top_w_names)
+            # FILTERING OUTLIERS AND SCAM
+            with st.spinner('Almost done...'):
+                self.without_outliers_tier1, self.scam_coins = self.filtering_outliers()
+                self.without_outliers_tier2, self.outliers_tier2 = self.finding_outliers_tier2()
+                self.combined_outliers, self.percentage_of_outliers = self.combining_all_outliers()
+            # DEALING WITH GAS AND GPT
             if self.if_gas:
                 self.gas_df = self.gas_prep()
             if self.if_gpt:
                 self.gpt = self.gpt_conclusions()
-        else:
+        else:  # IF NO TRANSACTIONS TO ANALYZE = SHOWING EMPTY RESULTS
             self.top_contracts = self.overall_contracts = self.necessary_cols = self.top_w_names = \
                 self.top_w_prices = self.no_price = self.shit_coins = self.without_outliers_tier1 = self.scam_coins = \
                 self.without_outliers_tier2 = self.outliers_tier2 = self.combined_outliers = self.gas_df =\
@@ -83,22 +105,30 @@ class Analysis:
         def etherscan_api(start_block=1):
             which_trans = "tokentx" if which == "erc20" else "txlistinternal" if which == "internal" else "txlist"
             headers = {'Accept': 'application/json'}
-            etherscan = requests.get(f'https://api.etherscan.io/api?module=account&action='
-                                     f'{which_trans}&address='
-                                     f'{self.address}&startblock={start_block}&endblock=98299157&apikey='
-                                     f'{self.etherscan_api_key}', headers=headers)
+            link = f'https://api.etherscan.io/api?module=account&action={which_trans}&address=' \
+                   f'{self.address}&startblock={start_block}&endblock=98299157&apikey=' \
+                   f'{self.etherscan_api_key}'
+            logging.debug(f'Obtaining {which} {link}')
+            etherscan = requests.get(link, headers=headers)
+            logging.debug(f'Obtained {which}')
             if len(etherscan.json()['result']) == 0:
                 return None
             return pd.DataFrame(etherscan.json()['result'])
-
+        sleep(3)
         data = etherscan_api()
+        logging.debug(f'Length of {which} : {len(data) if data is not None else ""}')
         if data is None:
+            logging.debug(f'The data of {which} IS NONE')
             return self.no_transactions
         else:
             if len(data) != 10000:
+                logging.debug(f'The length of {which} IS NOT 10000 - returning')
                 return data
             else:
+                logging.debug(f'The length of {which} IS 10000 - sending to interate over')
                 while True:
+                    sleep(3)
+                    logging.debug(f'{which}: iteration')
                     last_block = data.tail(1)['blockNumber'].values[0]
                     data = data[data['blockNumber'] != last_block]
                     new_data = etherscan_api(start_block=last_block)
@@ -115,26 +145,33 @@ class Analysis:
             res['timeStamp'] = pd.to_datetime(res['timeStamp'].astype(int), unit='s')
             res = res[(res['timeStamp'].dt.date >= self.start_date) & (res['timeStamp'].dt.date <= self.end_date)]
             res['tokenSymbol'] = "ETH"
-            with_price, no_price, shit_coins = self.finding_prices(res, which='internal')  # the other 2 aren't used
+            with_price = self.finding_prices(res, which='internal')[0]  #the other 2 aren't used
             if self.if_contracts_names:  # ADDING TAGS
                 with_price = self.finding_contract_names(with_price)
             with_price = with_price.loc[:, ~with_price.columns.isin(['contractAddress', 'input',  # EXCLUDING COLUMNS
                                                                      'type', 'gasUsed', 'traceId',
                                                                      'isError', 'errCode', 'tokenSymbol', 'hash'])]
-            return with_price.sort_values(by='timeStamp', ascending=False)
+            with_price = self.filtering_destinations(with_price)  # FILTERING
+            logging.debug('the internal df was obtained!')
+            return with_price.sort_values(by='timeStamp', ascending=False).reset_index(drop=True)
         else:
             return self.no_transactions
 
-    def find_top_contracts(self, num_of_contracts):
-        contracts_list = self.adjusted.copy()['contractAddress'].value_counts().reset_index()['contractAddress']
-        overall = len(contracts_list)
-        contracts_list_top = contracts_list[:num_of_contracts if not self.if_all_contracts else overall]
-        return self.adjusted[self.adjusted['contractAddress'].isin(contracts_list_top)] \
-                   .copy().reset_index().iloc[:, 1:], overall
+    def filtering_destinations(self, df):
+        logging.debug(f'Length of the DF to filter: {len(df)}')
+        if not self.if_all_contracts:
+            from_list_top = df.copy()['from'].value_counts().reset_index()['from'][:self.number_of_dest]
+            to_list_top = df.copy()['to'].value_counts().reset_index()['to'][:self.number_of_dest]
+            res = df[(df['from'].isin(from_list_top)) & (df['to'].isin(to_list_top))].copy().reset_index(drop=True)
+            logging.debug(f'Finished filtering. Rows left: {len(res)}')
+            return res
+        else:
+            logging.debug('No need to filter. Continuing.')
+            return df
 
     def adjusting(self):
         adjusted = self.raw_df.copy()
-        normal = self.get_etherscan(which='normal')  # ADDING NORMAL TRANS
+        normal = self.normal_df  # ADDING NORMAL TRANS
         if len(adjusted) != 0:
             adjusted['tokenDecimal'] = adjusted['tokenDecimal'].astype(int)  # Solves that console bytes error
         if len(normal) != 0:
@@ -149,8 +186,10 @@ class Analysis:
             adjusted['timeStamp'] = pd.to_datetime(adjusted['timeStamp'].astype(int), unit='s')
             adjusted = adjusted[(adjusted['timeStamp'].dt.date >= self.start_date) &
                                 (adjusted['timeStamp'].dt.date <= self.end_date)]
+            logging.debug('the df was adjusted!')
             return adjusted
         else:
+            logging.debug('The df is empty!')
             return self.no_transactions
 
     # @st.cache_data  # for development and testing
@@ -168,6 +207,8 @@ class Analysis:
                 return address
 
         addresses_unique = np.unique(df[['from', 'contractAddress', 'to']].values)
+
+        logging.debug(f"Length of unique addresses: {len(addresses_unique)}")
 
         res_dict = _self.name_tags_engine.get_name(list(addresses_unique))
         temp_df = df.copy()
@@ -261,7 +302,7 @@ class Analysis:
             clean = self.without_outliers_tier1[~(self.without_outliers_tier1['trans_value_US'] > slash)]
         else:
             clean, outliers = self.without_outliers_tier1, self.no_transactions
-        return clean.sort_values(by='timeStamp', ascending=False), outliers
+        return clean.sort_values(by='timeStamp', ascending=False).reset_index(drop=True), outliers
 
     def combining_all_outliers(self):
         self.no_price['token_price'] = self.no_price['token_price'].astype(str)
@@ -277,9 +318,10 @@ class Analysis:
                        and self.address[-8:].lower() == addr[-8:].lower() else False
 
     def gas_prep(self):
-        data = self.adjusted[self.adjusted['from'].apply(lambda x: self.check_if_self(x))].copy()
+        logging.debug('Started GAS calculation')
+        data = self.without_outliers_tier2[self.without_outliers_tier2['from']
+                                           .apply(lambda x: self.check_if_self(x))].copy()
         if len(data) != 0:
-            data = self.finding_contract_names(data)
             data = data.reset_index(drop=True)[['timeStamp', 'contractAddress', 'to', 'tokenSymbol', 'gasUsed',
                                                 'gasPrice']]
             data = data.drop_duplicates('timeStamp')  # removing duplicates
@@ -288,7 +330,7 @@ class Analysis:
 
             data = data.rename(columns={'tokenSymbol': 'tokenSymbol_'})
             data['tokenSymbol'] = "ETH"
-            data, no_price, shit_coins = self.finding_prices(data, gas=True)  # the other 2 aren't used
+            data = self.finding_prices(data, gas=True)[0]  # the other 2 aren't used
             data['txnCost_US'] = data['txnCost_ETH'] * data['token_price'].astype(float)
             return data
         else:
@@ -351,7 +393,8 @@ class Analysis:
                              time_data_days=self.time_consideration_days(gpt=True) if self.if_time else None,
                              gas_data_tokens=self.gas_consideration(by='tokens', gpt=True) if self.if_gas else None,
                              gas_data_contracts=self.gas_consideration(by='contracts', gpt=True)
-                             if self.if_gas else None)
+                             if self.if_gas else None,
+                             overall_destinations=self.overall_destinations)
         with st.spinner('GPT is thinking...'):
             gpt_resp = gpt.ask_gpt()
         return introduction + gpt_resp + warning

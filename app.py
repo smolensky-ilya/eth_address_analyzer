@@ -1,4 +1,3 @@
-import streamlit as st
 from datetime import datetime
 from analysis import Analysis
 from config import *
@@ -14,17 +13,17 @@ run_it_params = params['r'] if 'r' in params else False  # if in the params
 # SIDEBAR
 address_given = st.sidebar.text_input('Address', value=params['a'][0] if 'a' in params else def_val['address_given'],
                                       help=addr_notice, max_chars=42, )
-if_include_all_contracts = st.sidebar.checkbox("All contracts", value=params['iac'][0]
-                                               if 'iac' in params else def_val['if_include_all_contracts'],
-                                               help=all_contracts_notice)
+if_include_all_dest = st.sidebar.checkbox("All destinations", value=params['iac'][0]
+                                               if 'iac' in params else def_val['if_include_all_dest'],
+                                          help=all_dest_notice)
 if_use_real_prices = st.sidebar.checkbox("Real prices", value=params['urp'][0]
                                          if 'urp' in params else def_val['if_use_real_prices'], help=real_prices_notice)
 if_gpt_conclusions = st.sidebar.checkbox("GPT conclusions", help=gpt_conclusions_notice,
                                          value=params['gpt'][0] if 'gpt' in params else def_val['if_gpt_conclusions'])
-chosen_number_of_contracts = st.sidebar.number_input('TOP contracts to analyze', help=top_contracts,
-                                                     value=int(params['nc'][0]) if 'nc' in params
-                                                     else def_val['chosen_number_of_contracts'],
-                                                     disabled=if_include_all_contracts)
+num_of_dest = st.sidebar.number_input('TOP destinations to analyze', help=num_of_dest_notice,
+                                      value=int(params['nc'][0]) if 'nc' in params
+                                      else def_val['num_of_dest'],
+                                      disabled=if_include_all_dest, min_value=1)
 chosen_top = st.sidebar.number_input('MAX items shown in graphs and tables', help=chosen_top_notice, min_value=1,
                                      value=int(params['ct'][0]) if 'ct' in params else def_val['chosen_top'])
 chosen_start_date = st.sidebar.date_input('Starting date', help=start_date_notice,
@@ -53,7 +52,7 @@ volume_threshold = st.sidebar.number_input("Exclude if volume is N-times bigger 
                                            help=volume_thr_notice, min_value=1)
 value_threshold = st.sidebar.number_input("Exclude if value is N-times bigger than Q3", help=value_thr_notice,
                                           value=int(params['ovt'][0]) if 'ovt' in params
-                                          else def_val['value_threshold'][0] if if_include_all_contracts else
+                                          else def_val['value_threshold'][0] if if_include_all_dest else
                                           def_val['value_threshold'][1], disabled=False if if_excl_outliers else True,
                                           min_value=1)
 run_it = st.sidebar.button('Do the magic')
@@ -61,9 +60,8 @@ run_it = st.sidebar.button('Do the magic')
 if run_it or run_it_params:
     # SET LINK PARAMS
     params = dict(a=address_given if address_given != def_val['address_given'] else None,
-                  nc=chosen_number_of_contracts if chosen_number_of_contracts != def_val['chosen_number_of_contracts']
-                  else None,
-                  iac=if_include_all_contracts if if_include_all_contracts != def_val['if_include_all_contracts']
+                  nc=num_of_dest if num_of_dest != def_val['num_of_dest'] else None,
+                  iac=if_include_all_dest if if_include_all_dest != def_val['if_include_all_dest']
                   else None,
                   sd=chosen_start_date if chosen_start_date != def_val['chosen_start_date'] else None,
                   ed=chosen_end_date if chosen_end_date != def_val['chosen_end_date'] else None,
@@ -83,20 +81,22 @@ if run_it or run_it_params:
     st.experimental_set_query_params(**{key: value for key, value in params.items() if value is not None})
     logging.info(f'Analysing {address_given}')
     if address_given is not None and address_given != "" and len(address_given) == 42:
-        with st.spinner('Gathering info...'):
-            instance = Analysis(address_given if address_given is not None else None, chosen_number_of_contracts,
-                                if_all_contracts=if_include_all_contracts, start_date=chosen_start_date,
+        with st.spinner('Putting out fires...'):
+            instance = Analysis(address_given if address_given is not None else None, number_of_dest=num_of_dest,
+                                if_all_contracts=if_include_all_dest, start_date=chosen_start_date,
                                 end_date=chosen_end_date, if_cont_names=if_contracts_names, if_gas_tick=if_gas,
                                 if_exclude_phishing=if_excl_phishing, outlier_value_threshold=value_threshold,
                                 outlier_volume_threshold=volume_threshold, exclude_outlying=if_excl_outliers,
                                 use_real_prices=if_use_real_prices, if_int=if_internal, if_gpt=if_gpt_conclusions,
                                 if_time_needed=if_time, chosen_top=chosen_top)
-        st.title(f'{address_given} has something to say')
+        st.header(f':heavy_check_mark: _{address_given}_ has revealed its secrets :sunglasses:', divider='rainbow')
         # SHOWING METRICS
-        col1, col2, col3 = st.columns([5, 4, 4])
-        col1.metric("Interacted contracts", instance.overall_contracts)
-        col2.metric("Interacted tokens", instance.over_tokens)
-        col3.metric("Excluded transactions (outliers or scam)", instance.percentage_of_outliers)
+        col1, col2, col3, col4 = st.columns([4, 4, 4, 4])
+        col1.metric("Interacted contracts", instance.overall_contracts, help=inter_cont_notice)
+        col2.metric("Interacted tokens", instance.over_tokens, help=inter_tokens_notice)
+        col3.metric("Analyzed/overall destinations", str(instance.analyzed_destinations) + " / " +
+                    str(instance.overall_destinations), help=destinations_notice)
+        col4.metric("Excluded transactions", instance.percentage_of_outliers, help=outliers_notice)
         # NON-REAL PRICES WARNING
         if not if_use_real_prices:
             st.warning(prices_warning, icon='⚠️')
@@ -143,7 +143,7 @@ if run_it or run_it_params:
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):
             st.markdown(f"<h4 style='text-align: left;'>ERC-20 AND ETH transactions involving TOP "
-                        f"{chosen_number_of_contracts if not if_include_all_contracts else instance.overall_contracts}"
+                        f"{num_of_dest if not if_include_all_dest else instance.overall_contracts}"
                         f" contracts</h3>", unsafe_allow_html=True)
             st.write(instance.without_outliers_tier2)
         # INTERNAL TRANSACTIONS

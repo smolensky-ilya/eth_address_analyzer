@@ -1,5 +1,6 @@
 from datetime import date
 import logging
+import streamlit as st
 
 
 def configure_logging():
@@ -19,10 +20,11 @@ def configure_logging():
             logger_obj.setLevel(logging.ERROR)
 
 
+# MAIN PAGE VALUES
 def_val = dict(address_given=None,
-               if_include_all_contracts=False,
+               if_include_all_dest=False,
                if_use_real_prices=False,
-               chosen_number_of_contracts=30,
+               num_of_dest=100,
                chosen_top=10,
                chosen_start_date=date(year=2023, month=1, day=1),
                chosen_end_date=date.today(),
@@ -36,20 +38,28 @@ def_val = dict(address_given=None,
                if_gpt_conclusions=True,
                if_gas=True
                )
+# ANALYSIS SETTINGS
+conf_etherscan_api_key = st.secrets['etherscan_api_key']
+conf_not_found_message = "Address wasn't found :("
+conf_untagged_contracts_name = 'Untagged*'
+conf_etherscan_sleep_time = 3
+conf_etherscan_save_frequency = 1  #TEMPORARY
+conf_stabl_coins = ['usdt', 'usdc', 'dai', 'mim']
+conf_stable_coins_price = 1.00
+conf_prices_save_frequency = 1  # TEMPORARY
+conf_gecko_error_sleep_time = 30  # OPTIMAL
 # NOTICES
 addr_notice = 'Insert a valid ETH address to perform the analysis.'
-all_contracts_notice = 'ILL-ADVISED. It will include all contracts the address has interacted with over a ' \
-                       'chosen period in the analysis. If you opt for this feature, be sure to adjust the exclusion' \
-                       ' (outliers) parameters below. Otherwise, the presence of outliers (scam transactions) ' \
-                       'is likely to ruin the analysis.'
+all_dest_notice = 'ILL-ADVISED if analyzing an address with a vast number of unique destinations. IF OUTED OUT, ' \
+                  'only the N most frequent ones chosen above are taken into the analysis.'
 real_prices_notice = 'EXTREMELY TIME-CONSUMING. What it does is parce the price of each token on the transaction day ' \
                      'from CoinGecko API. OTHERWISE, the transaction volumes are calculated based on token prices' \
                      ' as of today.'
 gpt_conclusions_notice = 'THERE MAY NOT BE ACCURATE. If opted for, a GPT model is given the analyzed data and asked ' \
                          'to make conclusions.'
-top_contracts = 'This limits the analysis to only top N most interacted contracts by the number of transactions. If ' \
-                'the address has interacted with fewer than N, all interacted contracts are included. Useful ' \
-                'when analysing addresses with a large number of diverse operations.'
+num_of_dest_notice = 'This limits the analysis to only top N most frequent destinations by the number of ' \
+                     'transactions. If the address has interacted with fewer than N, all interacted contracts are' \
+                     ' included. Useful when analysing addresses with a large number of diverse operations.'
 chosen_top_notice = "How many tokens/contracts/etc. are shown in graphs. Other ones are included in 'Other'."
 start_date_notice = 'Transactions of the address beginning on the chosen date are included in the analysis.'
 end_date_notice = 'The last date of transactions to analyse.'
@@ -71,3 +81,9 @@ gas_expenses_warning = "The ETH price is taken AS OF TODAY. If you require the a
                        "please tick REAL PRICES on the left."
 prices_warning = "Please keep in mind that token prices in the entire report (and hence the transaction volumes) " \
                  "are calculated AS OF TODAY. Tick REAL PRICES on the left to see historical data, if need be."
+inter_cont_notice = 'The number of unique contacts the address has interacted with over the chosen time period.'
+inter_tokens_notice = 'The number of unique tokens the address has interacted with over the chosen time period.'
+destinations_notice = 'The destinations included in the analysis (CAN BE ADJUSTED ON THE LEFT) / the total number of ' \
+                      'unique destinations the address has interacted with over the chosen period.'
+outliers_notice = 'Outliers or Scam transactions either marked as "Phishing" by etherscan or following the parameters' \
+                  ' chosen on the left.'

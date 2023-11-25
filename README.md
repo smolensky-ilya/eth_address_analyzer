@@ -7,8 +7,8 @@ The ETH Address Analyzer is a cutting-edge data science tool designed for in-dep
 - **Comprehensive Analysis**: Parses ETH address data from Etherscan and CoinGecko.
 - **Data Visualization**: Creates detailed graphs and tables.
 - **AI-Powered Conclusions**: Utilizes GPT models for insightful conclusions.
-- **User-Friendly Interface**: Streamlit web application for ease of use.
 - **Real-Time Data Processing**: Options for historical or current token prices.
+- **Filtering Destinations**: An option to choose the number of the most frequent destinations to look into (if the address has too many)
 - **Adaptive Learning**: System learns with each analysis, storing data in a database for faster future processing.
 - **Efficient Data Retrieval**: Once token prices and contract names are stored, they are reused instantly in future analyses.
 - **Scam and Phishing Transaction Filter**: Ability to filter out scam and phishing transactions.
