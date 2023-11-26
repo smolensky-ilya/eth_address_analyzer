@@ -55,7 +55,7 @@ class GptConclusions:
             current_attempt = 0
             while attempts != current_attempt:
                 response = g4f.ChatCompletion.create(
-                    model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"{self.prompt_comb}"}])
+                    model="llama2-7b", messages=[{"role": "user", "content": f"{self.prompt_comb}"}])
                 if len(response) != 0:
                     return response
                 sleep(3)
