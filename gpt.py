@@ -2,6 +2,7 @@ import g4f
 import logging
 from config import configure_logging
 configure_logging()
+from time import sleep
 
 
 class GptConclusions:
@@ -10,7 +11,7 @@ class GptConclusions:
                  top_10_dest_from_vol, top_10_internal_trans_dest_quantity, top_10_internal_trans_dest_vol, time_data,
                  time_data_days, gas_data_tokens, gas_data_contracts, overall_destinations):
         self.safe_slicing = 15
-        self.error_message = 'THE GPT model is currently unavailable, sorry***'
+        self.error_message = 'The GPT model is currently unavailable, our apologies for that :('
         self.prompt_init = f"Can you write several conclusion paragraphs on the strategy of this ETH " \
                            f"address based on the " \
                            f"following data gathered from {start_date} until {end_date}:\n" \
@@ -49,14 +50,19 @@ class GptConclusions:
         logging.debug(self.prompt_comb)
 
     def ask_gpt(self):
-        response = g4f.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"{self.prompt_comb}"}], stream=True)
-        resp = []
-        for each in response:
-            resp.append(each)
-        if len(resp) == 0:
+        try:
+            attempts = 5  # temporary measure = this will be changed once a reliable models is found.
+            current_attempt = 0
+            while attempts != current_attempt:
+                response = g4f.ChatCompletion.create(
+                    model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"{self.prompt_comb}"}])
+                if len(response) != 0:
+                    return response
+                sleep(3)
+                current_attempt += 1
             return self.error_message
-        return ''.join(resp)
+        except:
+            return self.error_message
 
 
 def main():
