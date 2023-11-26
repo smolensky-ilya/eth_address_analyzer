@@ -1,4 +1,4 @@
-from freeGPT import Client
+import g4f
 import logging
 from config import configure_logging
 configure_logging()
@@ -9,9 +9,8 @@ class GptConclusions:
                  top_10_tokens_vol, top_10_dest_to_quantity, top_10_dest_to_vol, top_10_dest_from_quantity,
                  top_10_dest_from_vol, top_10_internal_trans_dest_quantity, top_10_internal_trans_dest_vol, time_data,
                  time_data_days, gas_data_tokens, gas_data_contracts, overall_destinations):
-        self.models = ['gpt4', 'falcon_40b', 'prodia', 'pollinations', 'gpt3']
         self.safe_slicing = 15
-        self.error_message = 'smth went wrong***'
+        self.error_message = 'THE GPT model is currently unavailable, sorry***'
         self.prompt_init = f"Can you write several conclusion paragraphs on the strategy of this ETH " \
                            f"address based on the " \
                            f"following data gathered from {start_date} until {end_date}:\n" \
@@ -49,19 +48,15 @@ class GptConclusions:
         self.prompt_comb = self.prompt_init + self.prompt_if_internal + self.prompt_if_gas + self.prompt_if_time
         logging.debug(self.prompt_comb)
 
-    def prompt(self, prompt, model):
-        while True:
-            try:
-                return Client.create_completion(model, prompt)
-            except Exception as e:
-                return self.error_message
-
     def ask_gpt(self):
-        for each in self.models:
-            resp = self.prompt(self.prompt_comb, each)
-            if resp != self.error_message:
-                return f"{each}: {resp}"
-        return self.error_message
+        response = g4f.ChatCompletion.create(
+            model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"{self.prompt_comb}"}], stream=True)
+        resp = []
+        for each in response:
+            resp.append(each)
+        if len(resp) == 0:
+            return self.error_message
+        return ''.join(resp)
 
 
 def main():
