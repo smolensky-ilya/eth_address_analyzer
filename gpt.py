@@ -1,8 +1,8 @@
+from time import sleep
 import g4f
 import logging
 from config import configure_logging
 configure_logging()
-from time import sleep
 
 
 class GptConclusions:
@@ -51,7 +51,7 @@ class GptConclusions:
 
     def ask_gpt(self):
         try:
-            attempts = 5  # temporary measure = this will be changed once a reliable models is found.
+            attempts = 5  # temporary measure = this will be changed once a reliable model is found.
             current_attempt = 0
             while attempts != current_attempt:
                 response = g4f.ChatCompletion.create(

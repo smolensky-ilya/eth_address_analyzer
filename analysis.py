@@ -290,8 +290,11 @@ class Analysis:
             logging.debug(f'Started the tier 1 filtering.')
             scam = self.top_w_prices['value'].describe()['75%'] + (self.top_w_prices['value'].describe()['75%'] *
                                                                    self.outlier_value_threshold)
-            scam_coins = self.top_w_prices.query('value > @scam').copy()
-            clean = self.top_w_prices.query('value < @scam').copy()
+            if scam > 1000:  # HELPS IF AN ADDRESS HAS TOO MANY 0 OR LOW VALUE TRANSACTIONS
+                scam_coins = self.top_w_prices.query('value > @scam').copy()
+                clean = self.top_w_prices.query('value < @scam').copy()
+            else:
+                clean, scam_coins = self.top_w_prices, self.no_transactions
         else:
             clean, scam_coins = self.top_w_prices, self.no_transactions
         return clean, scam_coins

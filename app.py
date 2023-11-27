@@ -13,13 +13,13 @@ run_it_params = params['r'] if 'r' in params else False  # if in the params
 # SIDEBAR
 address_given = st.sidebar.text_input('Address', value=params['a'][0] if 'a' in params else def_val['address_given'],
                                       help=addr_notice, max_chars=42, )
-if_include_all_dest = st.sidebar.checkbox("All destinations", value=params['iac'][0]
-                                               if 'iac' in params else def_val['if_include_all_dest'],
-                                          help=all_dest_notice)
 if_use_real_prices = st.sidebar.checkbox("Real prices", value=params['urp'][0]
                                          if 'urp' in params else def_val['if_use_real_prices'], help=real_prices_notice)
 if_gpt_conclusions = st.sidebar.checkbox("GPT conclusions", help=gpt_conclusions_notice,
                                          value=params['gpt'][0] if 'gpt' in params else def_val['if_gpt_conclusions'])
+if_include_all_dest = st.sidebar.checkbox("All destinations", value=params['iac'][0]
+                                          if 'iac' in params else def_val['if_include_all_dest'],
+                                          help=all_dest_notice)
 num_of_dest = st.sidebar.number_input('TOP destinations to analyze', help=num_of_dest_notice,
                                       value=int(params['nc'][0]) if 'nc' in params
                                       else def_val['num_of_dest'],
@@ -114,16 +114,20 @@ if run_it or run_it_params:
             col1, col3 = st.columns([4, 4])
             col1.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations FROM by quantity</h4>",
                           unsafe_allow_html=True)
-            col1.write(instance.top_destinations(chosen_top, by='quantity', from_or_to='from'))
+            col1.dataframe(instance.top_destinations(chosen_top, by='quantity', from_or_to='from'),
+                           use_container_width=True)
             col1.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations FROM by volume in $US</h4>",
                           unsafe_allow_html=True)
-            col1.write(instance.top_destinations(chosen_top, by='volume', from_or_to='from'))
+            col1.dataframe(instance.top_destinations(chosen_top, by='volume', from_or_to='from'),
+                           use_container_width=True)
             col3.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations TO by quantity</h4>",
                           unsafe_allow_html=True)
-            col3.write(instance.top_destinations(chosen_top, by='quantity', from_or_to='to'))
+            col3.dataframe(instance.top_destinations(chosen_top, by='quantity', from_or_to='to'),
+                           use_container_width=True)
             col3.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations TO by volume in $US</h4>",
                           unsafe_allow_html=True)
-            col3.write(instance.top_destinations(chosen_top, by='volume', from_or_to='to'))
+            col3.dataframe(instance.top_destinations(chosen_top, by='volume', from_or_to='to'),
+                           use_container_width=True)
         # PLOTTING TRANSACTION FLOWS
         with st.expander('Transactions flow'):
             with st.spinner('Plotting...'):
@@ -140,12 +144,19 @@ if run_it or run_it_params:
                                   config={'staticPlot': True})
                 col3.plotly_chart(instance.gas_consideration(chosen_top, by='contracts'), use_container_width=True,
                                   config={'staticPlot': True})
+                st.markdown(f"<h4 style='text-align: left;'>Analysed GAS Data</h3>", unsafe_allow_html=True)
+                st.dataframe(instance.gas_df[['timeStamp', 'contractAddress', 'to', 'gasUsed', 'gasPrice',
+                                              'tokenSymbol', 'token_price', 'txnCost_ETH', 'txnCost_US']]
+                             .rename(columns={'txnCost_ETH': 'Transaction Cost in ETH',
+                                              'txnCost_US': 'Transaction Cost in $US',
+                                              'token_price': 'Token Price (AS OF TODAY)' if not if_use_real_prices else
+                                              'Historical Price'}), use_container_width=True)
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):
             st.markdown(f"<h4 style='text-align: left;'>ERC-20 AND ETH transactions involving TOP "
                         f"{num_of_dest if not if_include_all_dest else instance.overall_destinations}"
                         f" destinations</h3>", unsafe_allow_html=True)
-            st.write(instance.without_outliers_tier2)
+            st.dataframe(instance.without_outliers_tier2, use_container_width=True)
         # INTERNAL TRANSACTIONS
         if if_internal:
             with st.expander('View Internal Transactions Flow'):
@@ -157,7 +168,7 @@ if run_it or run_it_params:
                 col2.plotly_chart(instance.plotting_internal_destinations(by='volume', choice=chosen_top),
                                   use_container_width=True, config={'staticPlot': True})
             with st.expander('View the Internal Transactions analysed dataset'):
-                st.write(instance.internal_df)
+                st.dataframe(instance.internal_df, use_container_width=True)
             if if_time:
                 with st.expander('Transactions time  analysis'):
                     st.plotly_chart(instance.time_consideration(), use_container_width=True)
@@ -169,7 +180,7 @@ if run_it or run_it_params:
             st.markdown(f"<h4 style='text-align: left;'>Outliers (missing prices, extortionately high transaction "
                         f"volume, etc.)</h4>",
                         unsafe_allow_html=True)
-            st.write(instance.combined_outliers)
+            st.dataframe(instance.combined_outliers, use_container_width=True)
     else:
         st.write('<--- Insert a valid address!')
 else:
