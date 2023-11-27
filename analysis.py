@@ -329,7 +329,7 @@ class Analysis:
                                            .apply(lambda x: self.check_if_self(x))].copy()
         if len(data) != 0:
             data = data.reset_index(drop=True)[['timeStamp', 'contractAddress', 'to', 'tokenSymbol', 'gasUsed',
-                                                'gasPrice']]
+                                                'gasPrice', 'trans_value_US']]
             data = data.drop_duplicates('timeStamp')  # removing duplicates
             data['gasPrice_ETH'] = data['gasPrice'].astype(np.int64) / 10 ** 18
             data['txnCost_ETH'] = data['gasUsed'].astype(int) * data['gasPrice_ETH']

@@ -146,11 +146,15 @@ if run_it or run_it_params:
                                   config={'staticPlot': True})
                 st.markdown(f"<h4 style='text-align: left;'>Analysed GAS Data</h3>", unsafe_allow_html=True)
                 st.dataframe(instance.gas_df[['timeStamp', 'contractAddress', 'to', 'gasUsed', 'gasPrice',
-                                              'tokenSymbol', 'token_price', 'txnCost_ETH', 'txnCost_US']]
-                             .rename(columns={'txnCost_ETH': 'Transaction Cost in ETH',
-                                              'txnCost_US': 'Transaction Cost in $US',
-                                              'token_price': 'Token Price (AS OF TODAY)' if not if_use_real_prices else
-                                              'Historical Price'}), use_container_width=True)
+                                              'tokenSymbol_', 'token_price', 'trans_value_US', 'txnCost_ETH',
+                                              'txnCost_US']] .rename(columns={'txnCost_ETH': 'Trans. Cost (ETH)',
+                                                                              'txnCost_US': 'Trans. Cost ($US)',
+                                                                              'token_price': 'ETH Price (AS OF TODAY)'
+                                                                              if not if_use_real_prices else
+                                                                              'Historical Price',
+                                                                              'trans_value_US':
+                                                                              'Trans. Vol. ($US)'}),
+                             use_container_width=True)
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):
             st.markdown(f"<h4 style='text-align: left;'>ERC-20 AND ETH transactions involving TOP "
