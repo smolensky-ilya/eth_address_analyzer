@@ -73,7 +73,7 @@ class Analysis:
                 # CALCULATING METRICS
                 self.over_tokens = len(self.adjusted['tokenSymbol'].copy().value_counts())
                 self.overall_contracts = len(self.adjusted['contractAddress'].copy().value_counts())
-                self.overall_destinations = len(np.unique(self.adjusted[['to', 'from']].values))  #INTERNAL ONES?!
+                self.overall_destinations = len(np.unique(self.adjusted[['to', 'from']].values))
                 self.analyzed_destinations = len(np.unique(self.top_contracts[['to', 'from']].values))
             # ADDING NAME TAGS FROM ETHERSCAN (IF OPTED FOR)
             with st.spinner('Stealing name tags from Etherscan...'):
@@ -145,7 +145,7 @@ class Analysis:
             res['timeStamp'] = pd.to_datetime(res['timeStamp'].astype(int), unit='s')
             res = res[(res['timeStamp'].dt.date >= self.start_date) & (res['timeStamp'].dt.date <= self.end_date)]
             res['tokenSymbol'] = "ETH"
-            with_price = self.finding_prices(res, which='internal')[0]  #the other 2 aren't used
+            with_price = self.finding_prices(res, which='internal')[0]
             if self.if_contracts_names:  # ADDING TAGS
                 with_price = self.finding_contract_names(with_price)
             with_price = with_price.loc[:, ~with_price.columns.isin(['contractAddress', 'input',  # EXCLUDING COLUMNS
@@ -365,7 +365,7 @@ class Analysis:
                               yaxis_title='Tokens' if by_tokens else 'Contracts', yaxis_title_font_size=20,
                               xaxis=dict(showgrid=True),
                               title=f'Gas expenses by {"Tokens" if by_tokens else "Contracts"}',
-                              title_font_size=25)
+                              title_font_size=17)
 
             return fig
         else:
@@ -457,7 +457,7 @@ class Analysis:
                               xaxis_title='Date', xaxis_title_font_size=20,
                               yaxis_title='Transactions in USD', yaxis_title_font_size=20,
                               title=f'ERC-20 + ETH Transactions chart (by {"Destination" if by_dest else "Tokens"})',
-                              title_font_size=25)
+                              title_font_size=17)
             return fig
         else:
             return self.empty_plot
@@ -489,8 +489,8 @@ class Analysis:
                               xaxis_title_font_size=20,
                               yaxis_title='Token', yaxis_title_font_size=20, xaxis=dict(showgrid=True),
                               title=f'TOP {choice} Tokens by'
-                                    f' {"Transaction Volume" if by_volume else "Number of Transactions"}',
-                              title_font_size=25)
+                                    f' {"Volume of Transactions" if by_volume else "Quantity of Transactions"}',
+                              title_font_size=17)
             return fig
         else:
             return self.empty_plot if not gpt else self.no_transactions
@@ -513,7 +513,7 @@ class Analysis:
                               xaxis_title_font_size=20, yaxis_title='Contract name',
                               yaxis_title_font_size=20, xaxis=dict(showgrid=True),
                               title=f'TOP {choice} Contracts by Number of Transactions' if by == 'quantity' else
-                              f'TOP {choice} Contracts by Volume of Transactions', title_font_size=25)
+                              f'TOP {choice} Contracts by Volume of Transactions', title_font_size=17)
             return fig
         else:
             if gpt:
@@ -533,7 +533,7 @@ class Analysis:
             fig.update_layout(barmode='relative', legend_title_text='From', legend_title_font_size=15,
                               height=500, xaxis_title='Date', xaxis_title_font_size=20,
                               yaxis_title='Transactions in USD', yaxis_title_font_size=20,
-                              title=f'Internal Transactions chart', title_font_size=25)
+                              title=f'Internal Transactions chart', title_font_size=17)
             return fig
         else:
             return self.empty_plot
@@ -563,7 +563,7 @@ class Analysis:
                                      line=dict(color='blue')))
             fig.update_layout(xaxis_title='Months', xaxis_title_font_size=20, yaxis_title='Time of transactions (UTC)',
                               yaxis_title_font_size=20, xaxis=dict(showgrid=True),
-                              title=f'Distribution of transactions time', title_font_size=25)
+                              title=f'Distribution of transactions time', title_font_size=17)
             return fig
         else:
             return self.empty_plot
@@ -593,7 +593,7 @@ class Analysis:
                                          showgrid=False), yaxis2=dict(title='Average Time (UTC)',
                                                                       titlefont_size=16, tickfont_size=14,
                                                                       overlaying='y', side='right', showgrid=False),
-                              title=f'Transactions by Days of the Week', title_font_size=25)
+                              title=f'Transactions by Days of the Week', title_font_size=17)
             return fig
         else:
             return self.empty_plot

@@ -4,7 +4,7 @@ from config import *
 import logging
 configure_logging()
 
-st.set_page_config(layout="wide", page_title='ETH analyser | SMK', page_icon="favicon.png",
+st.set_page_config(layout="wide", page_title='ETH analyzer | SMK', page_icon="favicon.png",
                    menu_items={'Report a bug': "mailto:ilya@s1q.ru",
                                'About': "Author: Ilya Smolenskiy"})
 st.markdown(css, unsafe_allow_html=True)  # LOADING CSS
@@ -114,19 +114,19 @@ if run_it or run_it_params:
         # PLOTTING TOP DESTINATIONS
         with st.expander('Destinations analysis'):
             col1, col3 = st.columns([4, 4])
-            col1.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations FROM by quantity</h4>",
+            col1.markdown(f"<h5 style='text-align: left;'>TOP {chosen_top} Destinations FROM by quantity</h5>",
                           unsafe_allow_html=True)
             col1.dataframe(instance.top_destinations(chosen_top, by='quantity', from_or_to='from'),
                            use_container_width=True)
-            col1.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations FROM by volume in USD</h4>",
+            col1.markdown(f"<h5 style='text-align: left;'>TOP {chosen_top} Destinations FROM by volume in USD</h5>",
                           unsafe_allow_html=True)
             col1.dataframe(instance.top_destinations(chosen_top, by='volume', from_or_to='from'),
                            use_container_width=True)
-            col3.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations TO by quantity</h4>",
+            col3.markdown(f"<h5 style='text-align: left;'>TOP {chosen_top} Destinations TO by quantity</h5>",
                           unsafe_allow_html=True)
             col3.dataframe(instance.top_destinations(chosen_top, by='quantity', from_or_to='to'),
                            use_container_width=True)
-            col3.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations TO by volume in USD</h4>",
+            col3.markdown(f"<h5 style='text-align: left;'>TOP {chosen_top} Destinations TO by volume in USD</h5>",
                           unsafe_allow_html=True)
             col3.dataframe(instance.top_destinations(chosen_top, by='volume', from_or_to='to'),
                            use_container_width=True)
@@ -146,7 +146,7 @@ if run_it or run_it_params:
                                   config={'staticPlot': True})
                 col3.plotly_chart(instance.gas_consideration(chosen_top, by='contracts'), use_container_width=True,
                                   config={'staticPlot': True})
-                st.markdown(f"<h4 style='text-align: left;'>Analysed GAS Data</h3>", unsafe_allow_html=True)
+                st.markdown(f"<h5 style='text-align: left;'>Analysed GAS Data</h5>", unsafe_allow_html=True)
                 st.dataframe(instance.gas_df[['timeStamp', 'contractAddress', 'to', 'gasUsed', 'gasPrice',
                                               'tokenSymbol_', 'token_price', 'trans_value_US', 'txnCost_ETH',
                                               'txnCost_US']] .rename(columns={'txnCost_ETH': 'Trans. Cost (ETH)',
@@ -159,9 +159,9 @@ if run_it or run_it_params:
                              use_container_width=True)
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):
-            st.markdown(f"<h4 style='text-align: left;'>ERC-20 AND ETH transactions involving TOP "
+            st.markdown(f"<h5 style='text-align: left;'>ERC-20 AND ETH transactions involving TOP "
                         f"{num_of_dest if not if_include_all_dest else instance.overall_destinations}"
-                        f" destinations</h3>", unsafe_allow_html=True)
+                        f" destinations</h5>", unsafe_allow_html=True)
             st.dataframe(instance.without_outliers_tier2, use_container_width=True)
         # INTERNAL TRANSACTIONS
         if if_internal:
@@ -183,8 +183,8 @@ if run_it or run_it_params:
         # OUTLIERS
         st.markdown("""---""")
         with st.expander(f"Transactions excluded from the analysis"):
-            st.markdown(f"<h4 style='text-align: left;'>Outliers (missing prices, extortionately high transaction "
-                        f"volume, etc.)</h4>",
+            st.markdown(f"<h5 style='text-align: left;'>Outliers (missing prices, extortionately high transaction "
+                        f"volume, etc.)</h5>",
                         unsafe_allow_html=True)
             st.dataframe(instance.combined_outliers, use_container_width=True)
     else:
