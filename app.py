@@ -91,7 +91,8 @@ if run_it or run_it_params:
                                 outlier_volume_threshold=volume_threshold, exclude_outlying=if_excl_outliers,
                                 use_real_prices=if_use_real_prices, if_int=if_internal, if_gpt=if_gpt_conclusions,
                                 if_time_needed=if_time, chosen_top=chosen_top)
-        st.header(f':heavy_check_mark: _{address_given}_ has revealed its secrets :sunglasses:', divider='rainbow')
+        st.header(f':heavy_check_mark: _{instance.address_nametag}_ has revealed its secrets :sunglasses:',
+                  divider='rainbow')
         # SHOWING METRICS
         col1, col2, col3, col4 = st.columns([4, 4, 4, 4])
         col1.metric("Interacted contracts", instance.overall_contracts, help=inter_cont_notice)

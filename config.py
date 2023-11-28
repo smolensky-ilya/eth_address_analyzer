@@ -13,7 +13,7 @@ def configure_logging():
     logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
     # Explicitly set the root logger level (use INFO for general use, DEBUG for detailed logging)
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)  # Adjust this as needed (INFO or DEBUG)
+    root_logger.setLevel(logging.INFO)  # Adjust this as needed (INFO or DEBUG)
     # Set all other loggers to ERROR level
     for logger_name, logger_obj in logging.root.manager.loggerDict.items():
         if isinstance(logger_obj, logging.Logger):  # Check if it's an actual Logger instance
