@@ -7,55 +7,57 @@ configure_logging()
 st.set_page_config(layout="wide", page_title='ETH analyser | SMK', page_icon="favicon.png",
                    menu_items={'Report a bug': "mailto:ilya@s1q.ru",
                                'About': "Author: Ilya Smolenskiy"})
+st.markdown(css, unsafe_allow_html=True)  # LOADING CSS
 # LINK PARAMS
 params = st.experimental_get_query_params()
 run_it_params = params['r'] if 'r' in params else False  # if in the params
 # SIDEBAR
-address_given = st.sidebar.text_input('Address', value=params['a'][0] if 'a' in params else def_val['address_given'],
-                                      help=addr_notice, max_chars=42, )
-if_use_real_prices = st.sidebar.checkbox("Real prices", value=params['urp'][0]
-                                         if 'urp' in params else def_val['if_use_real_prices'], help=real_prices_notice)
-if_gpt_conclusions = st.sidebar.checkbox("GPT conclusions", help=gpt_conclusions_notice,
-                                         value=params['gpt'][0] if 'gpt' in params else def_val['if_gpt_conclusions'])
-if_include_all_dest = st.sidebar.checkbox("All destinations", value=params['iac'][0]
-                                          if 'iac' in params else def_val['if_include_all_dest'],
-                                          help=all_dest_notice)
-num_of_dest = st.sidebar.number_input('TOP destinations to analyze', help=num_of_dest_notice,
-                                      value=int(params['nc'][0]) if 'nc' in params
-                                      else def_val['num_of_dest'],
-                                      disabled=if_include_all_dest, min_value=1)
-chosen_top = st.sidebar.number_input('MAX items shown in graphs and tables', help=chosen_top_notice, min_value=1,
-                                     value=int(params['ct'][0]) if 'ct' in params else def_val['chosen_top'])
-chosen_start_date = st.sidebar.date_input('Starting date', help=start_date_notice,
-                                          value=datetime.strptime(params['sd'][0], "%Y-%m-%d")
-                                          if 'sd' in params else def_val['chosen_start_date'])
-chosen_end_date = st.sidebar.date_input('Ending date', help=end_date_notice,
-                                        value=datetime.strptime(params['ed'][0], "%Y-%m-%d")
-                                        if 'ed' in params else def_val['chosen_end_date'], max_value=date.today())
-if_internal = st.sidebar.checkbox('Internal transactions', help=internal_trans_notice,
-                                  value=params['ii'][0] if 'ii' in params else def_val['if_internal'])
-if_gas = st.sidebar.checkbox('Analyze GAS', help=gas_analysis_notice,
-                             value=params['ig'][0] if 'ig' in params else def_val['if_gas'])
-if_time = st.sidebar.checkbox('Transactions time', help=trans_time_notice,
-                              value=params['it'][0] if 'it' in params else def_val['if_time'])
-if_contracts_names = st.sidebar.checkbox("Addresses' tag names", help=tag_names_notice,
-                                         value=params['icn'][0] if 'icn' in params else def_val['if_contracts_names'])
-if_excl_phishing = st.sidebar.checkbox("Exclude phishing transactions", help=phishing_trans_notice,
-                                       value=params['iep'][0] if 'iep' in params else def_val['if_excl_phishing'] if
-                                       if_contracts_names else False,
-                                       disabled=False if if_contracts_names else True)
-if_excl_outliers = st.sidebar.checkbox("Exclude outliers", help=outlying_trans_notice,
-                                       value=params['eo'][0] if 'eo' in params else def_val['if_excl_outliers'])
-volume_threshold = st.sidebar.number_input("Exclude if volume is N-times bigger than mean",
+with st.sidebar.form('Params'):
+    address_given = st.text_input('Address', value=params['a'][0] if 'a' in params else def_val['address_given'],
+                                  help=addr_notice)
+    if_use_real_prices = st.checkbox("Real prices", value=params['urp'][0]
+                                     if 'urp' in params else def_val['if_use_real_prices'], help=real_prices_notice)
+    if_gpt_conclusions = st.checkbox("GPT conclusions", help=gpt_conclusions_notice,
+                                     value=params['gpt'][0] if 'gpt' in params else def_val['if_gpt_conclusions'])
+    if_include_all_dest = st.checkbox("All destinations", value=params['iac'][0]
+                                      if 'iac' in params else def_val['if_include_all_dest'],
+                                      help=all_dest_notice)
+    num_of_dest = st.number_input('TOP destinations to analyze', help=num_of_dest_notice,
+                                  value=int(params['nc'][0]) if 'nc' in params
+                                  else def_val['num_of_dest'],
+                                  disabled=if_include_all_dest, min_value=1)
+    chosen_top = st.number_input('MAX items shown in graphs and tables', help=chosen_top_notice, min_value=1,
+                                 value=int(params['ct'][0]) if 'ct' in params else def_val['chosen_top'])
+    chosen_start_date = st.date_input('Starting date', help=start_date_notice,
+                                      value=datetime.strptime(params['sd'][0], "%Y-%m-%d")
+                                      if 'sd' in params else def_val['chosen_start_date'])
+    chosen_end_date = st.date_input('Ending date', help=end_date_notice,
+                                    value=datetime.strptime(params['ed'][0], "%Y-%m-%d")
+                                    if 'ed' in params else def_val['chosen_end_date'], max_value=date.today())
+    if_internal = st.checkbox('Internal transactions', help=internal_trans_notice,
+                              value=params['ii'][0] if 'ii' in params else def_val['if_internal'])
+    if_gas = st.checkbox('Analyze GAS', help=gas_analysis_notice,
+                         value=params['ig'][0] if 'ig' in params else def_val['if_gas'])
+    if_time = st.checkbox('Transactions time', help=trans_time_notice,
+                          value=params['it'][0] if 'it' in params else def_val['if_time'])
+    if_contracts_names = st.checkbox("Addresses' tag names", help=tag_names_notice,
+                                     value=params['icn'][0] if 'icn' in params else def_val['if_contracts_names'])
+    if_excl_phishing = st.checkbox("Exclude phishing transactions", help=phishing_trans_notice,
+                                   value=params['iep'][0] if 'iep' in params else def_val['if_excl_phishing'] if
+                                   if_contracts_names else False, disabled=False if if_contracts_names else True)
+    if_excl_outliers = st.checkbox("Exclude outliers", help=outlying_trans_notice,
+                                   value=params['eo'][0] if 'eo' in params else def_val['if_excl_outliers'])
+    with st.expander('Exclusion parameters'):
+        volume_threshold = st.number_input("Exclude if volume is N-times bigger than mean",
                                            value=int(params['ovot'][0]) if 'ovot' in params else
                                            def_val['volume_threshold'], disabled=False if if_excl_outliers else True,
                                            help=volume_thr_notice, min_value=1)
-value_threshold = st.sidebar.number_input("Exclude if value is N-times bigger than Q3", help=value_thr_notice,
+        value_threshold = st.number_input("Exclude if value is N-times bigger than Q3", help=value_thr_notice,
                                           value=int(params['ovt'][0]) if 'ovt' in params
                                           else def_val['value_threshold'][0] if if_include_all_dest else
                                           def_val['value_threshold'][1], disabled=False if if_excl_outliers else True,
                                           min_value=1)
-run_it = st.sidebar.button('Do the magic')
+    run_it = st.form_submit_button('Do the magic')
 # MAIN FIELD
 if run_it or run_it_params:
     # SET LINK PARAMS
@@ -76,7 +78,7 @@ if run_it or run_it_params:
                   ct=chosen_top if chosen_top != def_val['chosen_top'] else None,
                   gpt=if_gpt_conclusions if if_gpt_conclusions != def_val['if_gpt_conclusions'] else None,
                   ig=if_gas if if_gas != def_val['if_gas'] else None,
-                  #r=True
+                  r=True
                   )
     st.experimental_set_query_params(**{key: value for key, value in params.items() if value is not None})
     logging.info(f'Analysing {address_given}')

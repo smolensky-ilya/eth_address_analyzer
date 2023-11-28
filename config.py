@@ -20,6 +20,16 @@ def configure_logging():
             logger_obj.setLevel(logging.ERROR)
 
 
+# CSS
+css = r'''
+    <style>
+        [data-testid="stForm"] {
+            border: 0px;
+            width: 105%;
+        }
+    </style>
+'''
+
 # MAIN PAGE VALUES
 def_val = dict(address_given=None,
                if_include_all_dest=False,
