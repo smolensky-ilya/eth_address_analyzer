@@ -1,8 +1,4 @@
 from datetime import datetime
-
-import PyInstaller.compat
-import streamlit
-
 from analysis import Analysis
 from config import *
 import logging
