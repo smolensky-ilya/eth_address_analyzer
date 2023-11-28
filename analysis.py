@@ -360,7 +360,7 @@ class Analysis:
                 return data
             fig = go.Figure(go.Bar(x=data['txnCost_US'], y=data['tokenSymbol_' if by_tokens else 'contractAddress'],
                                    orientation='h', text=data['percentage']))
-            fig.update_layout(xaxis_title='$US spent on transactions',
+            fig.update_layout(xaxis_title='USD spent on transactions',
                               xaxis_title_font_size=20,
                               yaxis_title='Tokens' if by_tokens else 'Contracts', yaxis_title_font_size=20,
                               xaxis=dict(showgrid=True),
@@ -455,7 +455,7 @@ class Analysis:
             fig.update_layout(barmode='relative', legend_title_text='Destinations' if by_dest else 'Tokens',
                               legend_title_font_size=15, height=500,
                               xaxis_title='Date', xaxis_title_font_size=20,
-                              yaxis_title='Transactions in $US', yaxis_title_font_size=20,
+                              yaxis_title='Transactions in USD', yaxis_title_font_size=20,
                               title=f'ERC-20 + ETH Transactions chart (by {"Destination" if by_dest else "Tokens"})',
                               title_font_size=25)
             return fig
@@ -485,7 +485,7 @@ class Analysis:
             fig = go.Figure(go.Bar(x=data['trans_value_US' if by_volume else 'count'],
                                    y=data['tokenSymbol'], orientation='h',
                                    text=data['percentage' if by_volume else 'count_percentage']))
-            fig.update_layout(xaxis_title='Transaction Volume in $US' if by_volume else 'Number of Transactions',
+            fig.update_layout(xaxis_title='Transaction Volume in USD' if by_volume else 'Number of Transactions',
                               xaxis_title_font_size=20,
                               yaxis_title='Token', yaxis_title_font_size=20, xaxis=dict(showgrid=True),
                               title=f'TOP {choice} Tokens by'
@@ -532,7 +532,7 @@ class Analysis:
                                      y=df[df['from'] == each]['trans_value_US'], name=each))
             fig.update_layout(barmode='relative', legend_title_text='From', legend_title_font_size=15,
                               height=500, xaxis_title='Date', xaxis_title_font_size=20,
-                              yaxis_title='Transactions in $US', yaxis_title_font_size=20,
+                              yaxis_title='Transactions in USD', yaxis_title_font_size=20,
                               title=f'Internal Transactions chart', title_font_size=25)
             return fig
         else:

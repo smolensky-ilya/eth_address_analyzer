@@ -118,7 +118,7 @@ if run_it or run_it_params:
                           unsafe_allow_html=True)
             col1.dataframe(instance.top_destinations(chosen_top, by='quantity', from_or_to='from'),
                            use_container_width=True)
-            col1.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations FROM by volume in $US</h4>",
+            col1.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations FROM by volume in USD</h4>",
                           unsafe_allow_html=True)
             col1.dataframe(instance.top_destinations(chosen_top, by='volume', from_or_to='from'),
                            use_container_width=True)
@@ -126,7 +126,7 @@ if run_it or run_it_params:
                           unsafe_allow_html=True)
             col3.dataframe(instance.top_destinations(chosen_top, by='quantity', from_or_to='to'),
                            use_container_width=True)
-            col3.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations TO by volume in $US</h4>",
+            col3.markdown(f"<h4 style='text-align: left;'>TOP {chosen_top} Destinations TO by volume in USD</h4>",
                           unsafe_allow_html=True)
             col3.dataframe(instance.top_destinations(chosen_top, by='volume', from_or_to='to'),
                            use_container_width=True)
@@ -150,12 +150,12 @@ if run_it or run_it_params:
                 st.dataframe(instance.gas_df[['timeStamp', 'contractAddress', 'to', 'gasUsed', 'gasPrice',
                                               'tokenSymbol_', 'token_price', 'trans_value_US', 'txnCost_ETH',
                                               'txnCost_US']] .rename(columns={'txnCost_ETH': 'Trans. Cost (ETH)',
-                                                                              'txnCost_US': 'Trans. Cost ($US)',
+                                                                              'txnCost_US': 'Trans. Cost (USD)',
                                                                               'token_price': 'ETH Price (AS OF TODAY)'
                                                                               if not if_use_real_prices else
                                                                               'Historical Price',
                                                                               'trans_value_US':
-                                                                              'Trans. Vol. ($US)'}),
+                                                                              'Trans. Vol. (USD)'}),
                              use_container_width=True)
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):

@@ -78,14 +78,14 @@ trans_time_notice = 'If ticked, the time of transactions is analysed and shown i
 tag_names_notice = "TAKES A BIT OF TIME. It parses addresses' tag names from Etherscan. IF OPTED OUT OF, the GPT" \
                    "conclusions don't work properly."
 phishing_trans_notice = "Transactions marked as 'PHISHING' on Etherscan are excluded from the analysis. "
-outlying_trans_notice = 'Transactions with ridiculously high token value or volume in $US are excluded from' \
+outlying_trans_notice = 'Transactions with ridiculously high token value or volume in USD are excluded from' \
                         'the analysis.'
 volume_thr_notice = 'The average volume of all transactions included in the analysis is calculated and all' \
                     'transaction volumes that are N-times bigger than the average are excluded from the analysis.'
 value_thr_notice = 'Token values that are N-times bigger than than 75% of the entire analysed data are excluded' \
                    'from the analysis.'
 gas_analysis_notice = "If ticked, the result will contain information on what tokens and contracts burnt the most ' \
-                      'GAS in total IN $US. IT'S RECOMMENDED to tick REAL PRICES above to be able to see the " \
+                      'GAS in total IN USD. IT'S RECOMMENDED to tick REAL PRICES above to be able to see the " \
                       "address's REAL GAS EXPENSES."
 gas_expenses_warning = "The ETH price is taken AS OF TODAY. If you require the address's REAL GAS EXPENSES, " \
                        "please tick REAL PRICES on the left."
