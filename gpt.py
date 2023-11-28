@@ -21,13 +21,13 @@ class GptConclusions:
                            f"{top_10_tokens_trans.to_string()},\n" \
                            f"Top interacted tokens by the volume of transactions in USD:\n" \
                            f"{top_10_tokens_vol[:self.safe_slicing].to_string()},\n" \
-                           f"Top destinations tokens were sent to by quantity:\n" \
+                           f"Top destinations that tokens were sent to by quantity:\n" \
                            f"{top_10_dest_to_quantity[:self.safe_slicing].to_string()},\n" \
-                           f"Top destinations tokens were sent to by volume in USD:\n" \
+                           f"Top destinations that tokens were sent to by volume in USD:\n" \
                            f"{top_10_dest_to_vol[:self.safe_slicing].to_string()},\n" \
-                           f"Top destinations tokens were sent from by quantity:\n" \
+                           f"Top destinations that tokens were sent from by quantity:\n" \
                            f"{top_10_dest_from_quantity[:self.safe_slicing].to_string()},\n" \
-                           f"Top destinations tokens were sent from by volume in USD:\n" \
+                           f"Top destinations that tokens were sent from by volume in USD:\n" \
                            f"{top_10_dest_from_vol[:self.safe_slicing].to_string()},\n"
         self.prompt_if_internal = f"Top internal transactions destinations by quantity:\n" \
                                   f"{top_10_internal_trans_dest_quantity[:self.safe_slicing].to_string()},\n" \
