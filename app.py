@@ -1,4 +1,8 @@
 from datetime import datetime
+
+import PyInstaller.compat
+import streamlit
+
 from analysis import Analysis
 from config import *
 import logging
@@ -105,7 +109,10 @@ if run_it or run_it_params:
             st.warning(prices_warning, icon='⚠️')
         # GPT ANALYSIS
         if if_gpt_conclusions:
-            st.info(instance.gpt, icon='🤖')
+            st.header(":robot_face: GPT: Address Activities Summarized", anchor=False, divider='red')
+            with st.expander('Open to View'):
+                st.info(instance.gpt, icon='❗')
+        st.header(':nerd_face: Detailed analysis', divider='violet')
         # PLOTTING TOP TOKENS
         col1, col2, col3 = st.columns([4, 1, 4])
         col1.plotly_chart(instance.top_10_tokens_plotting(chosen_top, by='number'), use_container_width=True,

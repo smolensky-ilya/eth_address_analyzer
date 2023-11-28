@@ -193,7 +193,7 @@ class Analysis:
             logging.debug('The df is empty!')
             return self.no_transactions
 
-    # @st.cache_data  # for development and testing
+    @st.cache_data  # for development and testing
     def finding_contract_names(_self, df):
         def get_contract_name(address, exl_self=True):
             if exl_self:
@@ -223,7 +223,7 @@ class Analysis:
             temp_df = temp_df[~condition]
         return temp_df
 
-    # @st.cache_data  # for development and testing
+    @st.cache_data  # for development and testing
     def finding_prices(_self, df, which='erc-20', gas=False):
         def get_prices(date, token):
             if token.lower() in _self.stabl_coins:
@@ -372,8 +372,7 @@ class Analysis:
             return self.empty_plot if not gpt else self.no_transactions
 
     def gpt_conclusions(self):
-        introduction = f' ---- Re-RUNNING the script may help to improve it ---- \n' \
-                       f'\nThe GPT model has the following to say about {self.address}:\n\n'
+        introduction = f' ---- RE-RUNNING the script may help to improve it ---- \n\n'
         warning = f'\n\n ---- The info above MAY NOT be entirely accurate. ----'
         from gpt import GptConclusions
         gpt = GptConclusions(start_date=self.start_date, end_date=self.end_date,
