@@ -110,7 +110,7 @@ if run_it or run_it_params:
         # GPT ANALYSIS
         if if_gpt_conclusions:
             st.header(":robot_face: GPT: Address Activities Summarized", anchor=False, divider='red')
-            with st.expander('Open to View'):
+            with st.expander('Give it a read'):
                 st.info(instance.gpt, icon='❗')
         st.header(':nerd_face: Detailed analysis', divider='violet')
         # PLOTTING TOP TOKENS
@@ -165,12 +165,14 @@ if run_it or run_it_params:
                                                                               'trans_value_US':
                                                                               'Trans. Vol. (USD)'}),
                              use_container_width=True)
+                st.caption(search_notice)
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):
             st.markdown(f"<h5 style='text-align: left;'>ERC-20 + ETH transactions involving TOP "
                         f"{num_of_dest if not if_include_all_dest else instance.overall_destinations}"
                         f" destinations</h5>", unsafe_allow_html=True)
             st.dataframe(instance.without_outliers_tier2, use_container_width=True)
+            st.caption(search_notice)
         # INTERNAL TRANSACTIONS
         if if_internal:
             with st.expander('View Internal Transactions Flow'):
@@ -186,6 +188,7 @@ if run_it or run_it_params:
             with st.expander('View the Internal Transactions analysed dataset'):
                 st.caption(int_trans_question, unsafe_allow_html=True, help=int_trans_explanation)
                 st.dataframe(instance.internal_df, use_container_width=True)
+                st.caption(search_notice)
             if if_time:
                 with st.expander('Transactions time  analysis'):
                     st.plotly_chart(instance.time_consideration(), use_container_width=True)
@@ -198,6 +201,7 @@ if run_it or run_it_params:
                         f"volume, etc.)</h5>",
                         unsafe_allow_html=True)
             st.dataframe(instance.combined_outliers, use_container_width=True)
+            st.caption(search_notice)
     else:
         st.write('<--- Insert a valid address!')
 else:

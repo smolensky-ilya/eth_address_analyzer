@@ -193,7 +193,7 @@ class Analysis:
             logging.debug('The df is empty!')
             return self.no_transactions
 
-    @st.cache_data  # for development and testing
+    # @st.cache_data  # for development and testing
     def finding_contract_names(_self, df):
         def get_contract_name(address, exl_self=True):
             if exl_self:
@@ -223,7 +223,7 @@ class Analysis:
             temp_df = temp_df[~condition]
         return temp_df
 
-    @st.cache_data  # for development and testing
+    # @st.cache_data  # for development and testing
     def finding_prices(_self, df, which='erc-20', gas=False):
         def get_prices(date, token):
             if token.lower() in _self.stabl_coins:

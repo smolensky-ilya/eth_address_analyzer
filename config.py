@@ -105,3 +105,4 @@ int_trans_explanation = 'Internal Transactions are unique events that occur as a
                         'transactions and thus require specialized tracking and interpretation.'
 internal_trans_notice = 'Parse internal transactions of the address from Etherscan and include them in the analysis.'\
     + int_trans_explanation
+search_notice = '* Select the dataframe and use CTRL + F to search'
