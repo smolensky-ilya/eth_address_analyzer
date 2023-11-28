@@ -40,10 +40,10 @@ class GptConclusions:
                              f"{gas_data_contracts[:self.safe_slicing].to_string()}.\n" if \
             gas_data_contracts is not None else ""
         self.prompt_if_time = f"Also, please assume the possible country the address might be operating from " \
-                              f"based on average transactions time and median (50 percentile) by months (UTC time):\n" \
+                              f"based on average transactions time and median by months (UTC time):\n" \
                               f"{time_data[:self.safe_slicing].to_string()}.\n Based on this information, please" \
                               f" assume a continent (or several possible countries) the address owner likely " \
-                              f"operates from.\n Also, here is the information on transactions by days of the week:\n" \
+                              f"operates from.\n Also, here is information on transactions by days of the week:\n" \
                               f"{time_data_days[:self.safe_slicing].to_string()} \nAre there any valuable insights?" if\
             time_data is not None else ""
         self.prompt_comb = self.prompt_init + self.prompt_if_internal + self.prompt_if_gas + self.prompt_if_time

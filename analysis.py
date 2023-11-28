@@ -550,16 +550,16 @@ class Analysis:
             average = data.groupby('month_year')['hour'].mean().reset_index() \
                 .rename(columns={'hour': 'average'})
             percentile_50 = data.groupby('month_year')['hour'].quantile(0.50).reset_index() \
-                .rename(columns={'hour': 'percentile_50'})
+                .rename(columns={'hour': 'median'})
             data = pd.merge(data, average, on='month_year', how='left')
             data = pd.merge(data, percentile_50, on='month_year', how='left')
             if gpt:
-                data = data[['month_year', 'average', 'percentile_50']].drop_duplicates()
+                data = data[['month_year', 'average', 'median']].drop_duplicates()
                 return data
             fig = px.scatter(data, x='month_year', y='hour')
-            fig.add_trace(go.Scatter(x=data['month_year'], y=data['average'], mode='lines', name='Average',
+            fig.add_trace(go.Scatter(x=data['month_year'], y=data['average'], mode='lines', name='Mean',
                                      line=dict(color='red')))
-            fig.add_trace(go.Scatter(x=data['month_year'], y=data['percentile_50'], mode='lines', name='percentile_50',
+            fig.add_trace(go.Scatter(x=data['month_year'], y=data['median'], mode='lines', name='Median',
                                      line=dict(color='blue')))
             fig.update_layout(xaxis_title='Months', xaxis_title_font_size=20, yaxis_title='Time of transactions (UTC)',
                               yaxis_title_font_size=20, xaxis=dict(showgrid=True),
@@ -585,12 +585,12 @@ class Analysis:
             fig = go.Figure()
             fig.add_trace(go.Bar(x=data['weekday'], y=data['Transactions'], name='Transactions', yaxis='y',
                                  text=data['percentage']))
-            fig.add_trace(go.Scatter(x=data['weekday'], y=data['average_hour'], name='Average time', yaxis='y2',
+            fig.add_trace(go.Scatter(x=data['weekday'], y=data['average_hour'], name='Mean Time', yaxis='y2',
                                      text=data['average_hour'], textposition='top center', mode="lines+markers+text",
                                      textfont=dict(size=14, color="red")))
             fig.update_layout(xaxis_title='Days of the Week', xaxis_title_font_size=16,
                               yaxis=dict(title='Number of Transactions', titlefont_size=16, tickfont_size=14,
-                                         showgrid=False), yaxis2=dict(title='Average Time (UTC)',
+                                         showgrid=False), yaxis2=dict(title='Average Tnx Hour (UTC)',
                                                                       titlefont_size=16, tickfont_size=14,
                                                                       overlaying='y', side='right', showgrid=False),
                               title=f'Transactions by Days of the Week', title_font_size=17)
