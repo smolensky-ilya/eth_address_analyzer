@@ -159,21 +159,24 @@ if run_it or run_it_params:
                              use_container_width=True)
         # VIEW ERC-20 DATASET
         with st.expander('View the ERC-20 + ETH analysed dataset'):
-            st.markdown(f"<h5 style='text-align: left;'>ERC-20 AND ETH transactions involving TOP "
+            st.markdown(f"<h5 style='text-align: left;'>ERC-20 + ETH transactions involving TOP "
                         f"{num_of_dest if not if_include_all_dest else instance.overall_destinations}"
                         f" destinations</h5>", unsafe_allow_html=True)
             st.dataframe(instance.without_outliers_tier2, use_container_width=True)
         # INTERNAL TRANSACTIONS
         if if_internal:
             with st.expander('View Internal Transactions Flow'):
+                st.caption(int_trans_question, unsafe_allow_html=True, help=int_trans_explanation)
                 st.plotly_chart(instance.plotting_internal_flows(), use_container_width=True)
             with st.expander('View TOP Internal destinations (contracts)'):
+                st.caption(int_trans_question, unsafe_allow_html=True, help=int_trans_explanation)
                 col1, col2 = st.columns([1, 1])
                 col1.plotly_chart(instance.plotting_internal_destinations(by='quantity', choice=chosen_top),
                                   use_container_width=True, config={'staticPlot': True})
                 col2.plotly_chart(instance.plotting_internal_destinations(by='volume', choice=chosen_top),
                                   use_container_width=True, config={'staticPlot': True})
             with st.expander('View the Internal Transactions analysed dataset'):
+                st.caption(int_trans_question, unsafe_allow_html=True, help=int_trans_explanation)
                 st.dataframe(instance.internal_df, use_container_width=True)
             if if_time:
                 with st.expander('Transactions time  analysis'):

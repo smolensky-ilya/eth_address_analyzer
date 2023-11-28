@@ -73,7 +73,6 @@ num_of_dest_notice = 'This limits the analysis to only top N most frequent desti
 chosen_top_notice = "How many tokens/contracts/etc. are shown in graphs. Other ones are included in 'Other'."
 start_date_notice = 'Transactions of the address beginning on the chosen date are included in the analysis.'
 end_date_notice = 'The last date of transactions to analyse.'
-internal_trans_notice = 'Parse internal transactions of the address from Etherscan and include them in the analysis.'
 trans_time_notice = 'If ticked, the time of transactions is analysed and shown in graphs.'
 tag_names_notice = "TAKES A BIT OF TIME. It parses addresses' tag names from Etherscan. IF OPTED OUT OF, the GPT" \
                    "conclusions don't work properly."
@@ -97,3 +96,12 @@ destinations_notice = 'The destinations included in the analysis (CAN BE ADJUSTE
                       'unique destinations the address has interacted with over the chosen period.'
 outliers_notice = 'Outliers or Scam transactions either marked as "Phishing" by etherscan or following the parameters' \
                   ' chosen on the left.'
+int_trans_question = 'What are :blue[INTERNAL TRANSACTIONS]?'
+int_trans_explanation = 'Internal Transactions are unique events that occur as a result of smart contract executions,' \
+                        ' rather than direct actions by users. Unlike standard blockchain transactions, they do ' \
+                        'not exist independently on the blockchain but are the outcomes of contracts transferring ' \
+                        'Ether or tokens internally. This distinction is crucial, as internal transactions, ' \
+                        'being a byproduct of smart contract interactions, are not recorded as standard ' \
+                        'transactions and thus require specialized tracking and interpretation.'
+internal_trans_notice = 'Parse internal transactions of the address from Etherscan and include them in the analysis.'\
+    + int_trans_explanation
