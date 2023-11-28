@@ -106,3 +106,5 @@ int_trans_explanation = 'Internal Transactions are unique events that occur as a
 internal_trans_notice = 'Parse internal transactions of the address from Etherscan and include them in the analysis.'\
     + int_trans_explanation
 search_notice = '* Select the dataframe and use CTRL + F to search'
+graphs_notice = '* Double-click on items in the legend to filter the graph based on select elements. ' \
+                'Double-click on the graph to restore it to the default view.'

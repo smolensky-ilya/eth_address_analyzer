@@ -140,6 +140,7 @@ if run_it or run_it_params:
                 st.plotly_chart(instance.plotting_trans(by='tokens'), use_container_width=True)
             with st.spinner('Plotting...'):
                 st.plotly_chart(instance.plotting_trans(by='Destinations'), use_container_width=True)
+            st.caption(graphs_notice)
         # GAS CONSIDERATION
         if if_gas:
             with st.expander('View gas distribution'):
@@ -174,6 +175,7 @@ if run_it or run_it_params:
             with st.expander('View Internal Transactions Flow'):
                 st.caption(int_trans_question, unsafe_allow_html=True, help=int_trans_explanation)
                 st.plotly_chart(instance.plotting_internal_flows(), use_container_width=True)
+                st.caption(graphs_notice)
             with st.expander('View TOP Internal destinations (contracts)'):
                 st.caption(int_trans_question, unsafe_allow_html=True, help=int_trans_explanation)
                 col1, col2 = st.columns([1, 1])
