@@ -195,11 +195,10 @@ class Analysis:
 
     # @st.cache_data  # for development and testing
     def finding_contract_names(_self, df):
-        def get_contract_name(address):
-            if address.lower() == _self.address.lower():
-                _self.address_nametag = res_dict[address.lower()] if address.lower() in res_dict.keys()\
-                    else _self.address
-                return _self.address
+        def get_contract_name(address, exl_self=True):
+            if exl_self:
+                if address.lower() == _self.address.lower():
+                    return _self.address
             if address in res_dict.keys():
                 res = res_dict[address]
                 if res == _self.untagged_contracts_name:
@@ -211,7 +210,7 @@ class Analysis:
         addresses_unique = np.unique(df[['from', 'contractAddress', 'to']].values)
         logging.debug(f"Length of unique addresses: {len(addresses_unique)}")
         res_dict = _self.name_tags_engine.get_name(list(addresses_unique))
-        _self.address_nametag = get_contract_name(_self.address)  # ADDING THE TAG TO SELF IF EXISTS
+        _self.address_nametag = get_contract_name(_self.address, exl_self=False)  # ADDING THE TAG TO SELF IF EXISTS
         temp_df = df.copy()
         temp_df['from'] = temp_df['from'].apply(lambda x: get_contract_name(x))
         temp_df['contractAddress'] = temp_df['contractAddress'].apply(lambda x: get_contract_name(x))
