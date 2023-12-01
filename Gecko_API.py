@@ -3,17 +3,14 @@ import pandas as pd
 from time import sleep
 from sqlalchemy import create_engine
 from streamlit import secrets
-from datetime import date
+from datetime import date, datetime, timedelta
 import logging
-from config import configure_logging
+from config import configure_logging, conf_day_shift_hours, conf_gecko_coin_exceptions
 configure_logging()
 
 
 class Gecko:
-    def __init__(self,
-                 sleep_time=30,
-                 save_frequency=10,
-                 no_coin_message='NO_SUCH_COIN*',
+    def __init__(self, sleep_time=30, save_frequency=10, no_coin_message='NO_SUCH_COIN*',
                  no_price_message='NO_PRICE_FOUND*'):
         self.format_df = {'timeStamp': [], 'tokenSymbol': [], 'hist_price': []}
         self.engine = create_engine(secrets['db_con_string'])
@@ -27,7 +24,8 @@ class Gecko:
         self.sleep_time = sleep_time
         self.dataframe = self.open_existing()
         self.list_of_coins_gecko = self.get_a_list_of_gecko_coins()
-        self.exceptions = {'ETH': 'staked-ether'}  # if there are more labels ETH on Gecko, pointing at the right one
+        self.exceptions = conf_gecko_coin_exceptions
+        self.day_shift_hours = conf_day_shift_hours
 
     def open_existing(self):
         logging.debug('Price parser: connected to the DB.')
@@ -48,6 +46,14 @@ class Gecko:
             self.save_data()
 
     def get_price(self, token, date_):
+        # If too little time has passed since the start of the day, prices on CoinGecko may not have been formed yet
+        # - shifting day to yesterday
+        if int(datetime.now().hour) < self.day_shift_hours and date_ == datetime.now().today().strftime('%d-%m-%Y'):
+            logging.info("It's too early to parse today's price - taking yesterday's.")
+            transformed_date = [int(x) for x in date_.split('-')]
+            date_ = (datetime(day=transformed_date[0], month=transformed_date[1], year=transformed_date[2]) -
+                     timedelta(days=1)).strftime('%d-%m-%Y')
+        # Continuing to search in saved or parse
         res = self.check_if_exists(token, date_)
         if res is None:
             price_parsed = self.parse_gecko_api(token, date_)
@@ -122,7 +128,7 @@ class Gecko:
 
 def main():
     g = Gecko()
-    print(g.get_price('ETH', '20-11-2023'))
+    print(g.get_price('ETH', '01-12-2023'))
 
 
 if __name__ == '__main__':

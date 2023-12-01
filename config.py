@@ -58,6 +58,8 @@ conf_stabl_coins = ['usdt', 'usdc', 'dai', 'mim']
 conf_stable_coins_price = 1.00
 conf_prices_save_frequency = 1  # TEMPORARY
 conf_gecko_error_sleep_time = 30  # OPTIMAL
+conf_day_shift_hours = 6  # Hours after the beginning of the day when parsing today's price is okay
+conf_gecko_coin_exceptions = {'ETH': 'staked-ether'}  # if there are more labels ETH on Gecko, pointing at the right one
 # NOTICES
 addr_notice = 'Insert a valid ETH address to perform the analysis.'
 all_dest_notice = 'ILL-ADVISED if analyzing an address with a vast number of unique destinations. IF OUTED OUT, ' \
