@@ -106,8 +106,7 @@ if run_it or run_it_params:
         # GPT ANALYSIS
         if if_gpt_conclusions:
             st.header(":robot_face: GPT: Address Activities Summarized", anchor=False, divider='red')
-            with st.expander('Give it a read'):
-                st.info(instance.gpt, icon='❗')
+            st.info(instance.gpt, icon='❗')
         st.header(':nerd_face: Detailed analysis', divider='violet')
         # PLOTTING TOP TOKENS
         col1, col2, col3 = st.columns([4, 1, 4])
