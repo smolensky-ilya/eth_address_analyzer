@@ -4,7 +4,6 @@ import numpy as np
 from time import sleep
 import plotly.graph_objects as go
 import plotly.express as px
-from stqdm import stqdm
 from config import *
 from contracts_names import ContractDb
 from Gecko_API import Gecko

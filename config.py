@@ -1,6 +1,10 @@
 from datetime import date
 import logging
 import streamlit as st
+from stqdm import stqdm
+from threading import RLock
+
+stqdm.set_lock(RLock())
 
 
 def configure_logging():
